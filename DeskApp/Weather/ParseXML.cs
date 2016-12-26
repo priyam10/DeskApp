@@ -11,7 +11,6 @@ namespace DeskApp.Weather
 {
     class ParseXML
     {
-        string rss_url;
         string xml_string;
        
 

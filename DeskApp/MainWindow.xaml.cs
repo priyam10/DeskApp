@@ -37,7 +37,6 @@ namespace DeskApp
             InitializeComponent();
             startRSSFeed();
             DataContext = new WeatherViewModel();
-            //DataContext = new RedditPost();
         }
 
         public void startRSSFeed()

@@ -13,7 +13,7 @@ namespace DeskApp.Weather
         private const string API_KEY = "2db5a5da5c3a27d247f2423a226fd5bf";
         private string CurrentUrl = "http://api.openweathermap.org/data/2.5/weather?" + "q=@LOC@&mode=xml&units=imperial&APPID=" + API_KEY;
         private string ForecastUrl = "http://api.openweathermap.org/data/2.5/forecast?" + "q=@LOC@&mode=xml&units=imperial&APPID=" + API_KEY;
-        private string CurrentDegrees;
+        private string CurrentDegrees { get; set; }
         private string CurrentDesc { get; set; }
         private string CurrentLocation { get; set; }
 
@@ -99,6 +99,26 @@ namespace DeskApp.Weather
         }
         #endregion
 
+        public void fetchCurrentWeather()
+        {
+            // Compose the query URL.
+            string url = CurrentUrl.Replace("@LOC@", this.currLocation);
+            Console.WriteLine("url is :" + url);
+
+            ParseXML parser = new ParseXML();
+            try
+            {
+                parser.GetFormattedXml(url);
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+            Weather temp_weather = parser.parseXMLDoc();
+            this.currDesc = temp_weather.currDesc;
+            this.currDegrees = temp_weather.currDegrees + " °F";
+            Console.WriteLine("nowweather curr_desc : " + this.currDesc);
+        }
 
 
         //Update stuff

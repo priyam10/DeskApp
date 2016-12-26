@@ -1,7 +1,7 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" x:Class="DeskApp.MainWindow"
+        xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" xmlns:Weather="clr-namespace:DeskApp.Weather" x:Class="DeskApp.MainWindow"
         WindowStyle="None" Topmost="True" WindowState="Maximized" 
         AllowsTransparency="True"
         ShowInTaskbar="False">
@@ -9,37 +9,50 @@
         <SolidColorBrush Opacity="0.5" Color="Transparent"/>
     </Window.Background>
 
-
     <Grid x:Name="grid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Rectangle x:Name="rect" Width="500" RadiusX="20" RadiusY="20" VerticalAlignment="Stretch" Fill="#99000000" Visibility="Collapsed" />
+        <Rectangle x:Name="rect" Width="Auto" RadiusX="20" RadiusY="20" VerticalAlignment="Stretch" Fill="#99000000" Visibility="Collapsed" />
         <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Width="32" Height="32" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" Background="Black" Panel.ZIndex="100" Click="Button_Click" Margin="0,276,0,227" Content="&gt;"/>
-        <Grid Grid.Column="0" Name="gridCol1">
-            <TabControl x:Name="tabView" Opacity="0.8" Background="Transparent" SelectionChanged="newTab_Clicked">
-                <TabItem Name="weatherTab" Header="Weather">
+        <Grid Grid.Column="0" x:Name="gridCol1">
+            <TabControl x:Name="tabView" Opacity="0.8" Background="Transparent" SelectionChanged="newTab_Clicked" Visibility="Collapsed">
+                <TabItem x:Name="weatherTab" Header="Weather">
                     <StackPanel Margin="5">
-                        <TextBox Name="txtLocation" Height="20" Margin="5" Width="100" HorizontalAlignment="Center" Text="{Binding currLocation}"></TextBox>
-                        <Image Name="currWeatherIcon"></Image>
-                        <TextBlock Name="currTemp" Foreground="White" FontSize="15" Text="{Binding currDegrees}"></TextBlock>
-                        <TextBlock Name="currWeatherDesc" FontSize="15" Foreground="White" Text="{Binding currDesc}"></TextBlock>
-                        <Button Name="btnForecast" Command="{Binding Path=GetCurrWeatherClick}"  Width="90" Height="30" Margin="5">Forecast</Button>
-                        <TextBox Name="txtXml" Width="90" Height="30" Margin="5"></TextBox>
+                        <TextBox x:Name="txtLocation" Height="20" Margin="5" Width="100" HorizontalAlignment="Center" Text="{Binding nowWeather.currLocation}"/>
+                        <Image x:Name="currWeatherIcon"/>
+                        <TextBlock x:Name="currTemp" Foreground="White" FontSize="15" Text="{Binding nowWeather.currDegrees}"/>
+                        <TextBlock x:Name="currWeatherDesc" FontSize="15" Foreground="White" Text="{Binding nowWeather.currDesc}"/>
+                        <Button x:Name="btnForecast" Command="{Binding GetCurrWeatherClick}"  Width="90" Height="30" Margin="5" Content="Forecast"/>
+                        <TextBox x:Name="txtXml" Width="90" Height="30" Margin="5"/>
                     </StackPanel>
                 </TabItem>
-                <TabItem Header="Reddit" Name="redditTab">
+                <TabItem Header="Reddit" x:Name="redditTab">
                     <StackPanel Margin="5">
-                        <TextBox Name="subredditBox" Height="20" Margin="5" Width="100" HorizontalAlignment="Center" Text="{Binding currSubreddit}"></TextBox>
-                        
+                        <TextBox x:Name="subredditBox" Height="20" Margin="5" Width="100" HorizontalAlignment="Center" Text="{Binding mySubreddit}"/>
+                        <Button x:Name="btnSearchReddit" Command="{Binding GetSubredditClick}"  Width="90" Height="30" Margin="5" Content="Search"/>
+                        <ListView Margin="8" Height="400" Width="650" Background="Black" ItemsSource="{Binding redditPostList}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Background="Transparent" Margin="5px" Orientation="Vertical">
+                                        <StackPanel Margin="5" Orientation="Horizontal">
+                                            <StackPanel.Resources>
+                                                <Image Source="{Binding thumbnail}" Width="150px" Height="80px" Opacity="1" x:Key="Null" Visibility="Hidden"></Image>
+                                            </StackPanel.Resources>
+                                            <Image Source="{Binding thumbnail}" Width="150px" Height="80px" Opacity="1"></Image>
+                                            <TextBlock Text="{Binding title}" Foreground="White" Width="Auto"/>                                            
+                                        </StackPanel>
+                                               <TextBlock Text="{Binding author}" Foreground="White" Width="Auto"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </StackPanel>
                 </TabItem>
-                <TabItem Header="Imgur" Name="imgurTab">
-                    <StackPanel Margin="5">
-                       
-                    </StackPanel>
+                <TabItem Header="Imgur" x:Name="imgurTab">
+                    <StackPanel Margin="5"/>
                 </TabItem>
             </TabControl>
 
