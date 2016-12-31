@@ -11,32 +11,46 @@ using System.Windows.Input;
 
 namespace DeskApp.Weather
 {
-    class WeatherViewModel : INotifyPropertyChanged //,ObservableCollection<RedditPost>
+    class GeneralViewModel : INotifyPropertyChanged //,ObservableCollection<RedditPost>
     {
-        private IList<Weather> _WeatherForecastList;
         private Weather NowWeather;
+        private ObservableCollection<Weather> WeatherList;
         private string MySubreddit;
-        private ObservableCollection<RedditPost> RedditPostList;        
-       
-        public WeatherViewModel()
+        private ObservableCollection<RedditPost> RedditPostList;
+        private ObservableCollection<RedditPost> CommentsList;
+
+        public GeneralViewModel()
         {
-            _WeatherForecastList = new List<Weather> { };
             NowWeather = new Weather();
+            WeatherList = new ObservableCollection<Weather>();
             RedditPostList = new ObservableCollection<RedditPost>();
             if(!String.IsNullOrEmpty(Properties.Settings.Default.FavLocation))
             {
                 nowWeather.currLocation = Properties.Settings.Default.FavLocation;
                 NowWeather.fetchCurrentWeather();
+                ObservableCollection<Weather> temp_list = Weather.fetchWeatherForecast(NowWeather.currLocation);
+                //WeatherList.Clear();
+                foreach (Weather w in temp_list)
+                {
+                    Weather weather_item = new Weather();
+                    weather_item.currDegrees = w.currDegrees;
+                    weather_item.currDesc = w.currDesc;
+                    weather_item.forecastTime = w.forecastTime;
+                    WeatherList.Add(weather_item);
+                }
+
             }
             if (!String.IsNullOrEmpty(Properties.Settings.Default.LastSubreddit))
             {
                 MySubreddit = Properties.Settings.Default.LastSubreddit;
-                //RedditPostList =  RedditPost.fetchRedditPosts(MySubreddit);
                 ObservableCollection<RedditPost> temp_posts = RedditPost.fetchRedditPosts(MySubreddit);
                 RedditPostList.Clear();
                 foreach (RedditPost rp in temp_posts)
-                {                   
-                    RedditPostList.Add(new RedditPost(rp.title, rp.author, rp.thumbnail));
+                {
+                    RedditPost new_redditpost = new RedditPost(rp.title, rp.author, rp.thumbnail);
+                    new_redditpost.showThumbnail = rp.showThumbnail;
+                    new_redditpost.commentsUrl = rp.commentsUrl;
+                    RedditPostList.Add(new_redditpost);
                 }
             }
         }
@@ -47,11 +61,37 @@ namespace DeskApp.Weather
             set { NowWeather = value; OnPropertyChanged("nowWeather"); }
         }
 
+        public ObservableCollection<Weather> weatherList
+        {
+            get
+            {
+                if (WeatherList == null)
+                {
+                    WeatherList = new ObservableCollection<Weather>();
+                }
+                return WeatherList;
+            }
+            set
+            {
+                if (WeatherList == null)
+                {
+                    WeatherList = new ObservableCollection<Weather>();
+                }
+                foreach (Weather w in value)
+                {
+                    WeatherList.Add(w);
+                }
+                OnPropertyChanged("weatherList");
+            }
+        }
+    
+
         public string mySubreddit
         {
             get { return MySubreddit;  }
             set { MySubreddit = value;  OnPropertyChanged("mySubreddit");  }
         }
+
 
         public ObservableCollection<RedditPost> redditPostList
         {
@@ -74,12 +114,6 @@ namespace DeskApp.Weather
                 OnPropertyChanged("redditPostList");
             }
         }
-
-        //public IList<Weather> WeatherForecast
-        //{
-        //    get { return _WeatherForecastList; }
-        //    set { _WeatherForecastList = value; }
-        //}
 
 
         #region INotifyPropertyChanged Members
@@ -122,6 +156,17 @@ namespace DeskApp.Weather
             Properties.Settings.Default.FavLocation = nowWeather.currLocation;
             Properties.Settings.Default.Save();
             NowWeather.fetchCurrentWeather();
+            //Fetch forecast
+            ObservableCollection<Weather> temp_list = Weather.fetchWeatherForecast(NowWeather.currLocation);
+            //WeatherList.Clear();
+            foreach (Weather w in temp_list)
+            {
+                Weather weather_item = new Weather();
+                weather_item.currDegrees = w.currDegrees;
+                weather_item.currDesc = w.currDesc;
+                weather_item.forecastTime = w.forecastTime;                
+                WeatherList.Add(weather_item);
+            }
         }
 
 
@@ -156,10 +201,16 @@ namespace DeskApp.Weather
             RedditPostList.Clear();
             foreach(RedditPost rp in temp_list)
             {
-                RedditPostList.Add(new RedditPost(rp.title, rp.author, rp.thumbnail));
+                //RedditPostList.Add(new RedditPost(rp.title, rp.author, rp.thumbnail));
+
+                RedditPost new_redditpost = new RedditPost(rp.title, rp.author, rp.thumbnail);
+                new_redditpost.showThumbnail = rp.showThumbnail;
+                new_redditpost.commentsUrl = rp.commentsUrl;
+                RedditPostList.Add(new_redditpost);
             }
             //RedditPostList = temp_list;
         }
 
+       // onclick of post. fetch comments. assign to commentslist. 
     }
 }

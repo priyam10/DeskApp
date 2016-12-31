@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DeskApp.Weather;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace DeskApp.Reddit
 {
@@ -14,13 +16,19 @@ namespace DeskApp.Reddit
         private string Title { get; set; }
         private string Author { get; set; }
         private string Thumbnail { get; set; }
-
+        private string ShowThumbnail { get; set; }
+        private string CommentsUrl { get; set; }
+        private string PostsView { get; set; }
 
         public RedditPost(string title, string author, string thumbnail)
         {
             this.Title = title;
             this.Author = author;
             this.Thumbnail = thumbnail;
+        }
+
+        public RedditPost()
+        {
         }
 
         public string title
@@ -39,6 +47,24 @@ namespace DeskApp.Reddit
         {
             get { return Thumbnail; }
             set { Thumbnail = value;  OnPropertyChanged("thumbnail");  }
+        }
+
+        public string showThumbnail
+        {
+            get { return ShowThumbnail; }
+            set { ShowThumbnail = value; OnPropertyChanged("showThumbnail"); }
+        }
+
+        public string commentsUrl
+        {
+            get { return CommentsUrl; }
+            set { CommentsUrl = value; OnPropertyChanged("commentsUrl"); }
+        }
+
+        public string postsView
+        {
+            get { return PostsView; }
+            set { PostsView = value; OnPropertyChanged("postsView"); }
         }
 
         public static ObservableCollection<RedditPost> fetchRedditPosts(string subreddit)
@@ -61,6 +87,39 @@ namespace DeskApp.Reddit
             return test;
         }
 
+        private ICommand openRedditPost;
+
+        public ICommand OpenRedditPost
+        {
+            get
+            {
+                if (openRedditPost == null)
+                {
+                    openRedditPost = new RelayCommand(
+                        param => this.OnRedditPostClick()
+                    );
+                }
+                return openRedditPost;
+            }
+        }
+
+        public void OnRedditPostClick()
+        {         
+            postsView = "Hidden";
+
+            string url = commentsUrl + "/.rss";
+            RedditParseXML parser = new RedditParseXML();
+            try
+            {
+                parser.GetFormattedXml(url);
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+            ObservableCollection<RedditPost> test = new ObservableCollection<RedditPost>();
+            parser.parseCommentsXml();
+        }
 
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;

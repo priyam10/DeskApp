@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -11,12 +12,12 @@ namespace DeskApp.Weather
     class Weather : INotifyPropertyChanged
     {
         private const string API_KEY = "2db5a5da5c3a27d247f2423a226fd5bf";
-        private string CurrentUrl = "http://api.openweathermap.org/data/2.5/weather?" + "q=@LOC@&mode=xml&units=imperial&APPID=" + API_KEY;
-        private string ForecastUrl = "http://api.openweathermap.org/data/2.5/forecast?" + "q=@LOC@&mode=xml&units=imperial&APPID=" + API_KEY;
+        private const string CurrentUrl = "http://api.openweathermap.org/data/2.5/weather?" + "q=@LOC@&mode=xml&units=imperial&APPID=" + API_KEY;
+        private const string ForecastUrl = "http://api.openweathermap.org/data/2.5/forecast?" + "q=@LOC@&mode=xml&units=imperial&APPID=" + API_KEY;
         private string CurrentDegrees { get; set; }
         private string CurrentDesc { get; set; }
         private string CurrentLocation { get; set; }
-
+        private string ForecastTime { get; set; }
         // publicly currDegrees, privately CurrentDegrees
         public string currDegrees
         {
@@ -59,34 +60,20 @@ namespace DeskApp.Weather
             }
         }
 
-
-        // publicly currUrl, privately CurrentUrl
-        public string currUrl
+        public string forecastTime
         {
             get
             {
-                return CurrentUrl;
+                return ForecastTime;
             }
             set
             {
-                CurrentUrl = value;
-                OnPropertyChanged("currUrl");
+                ForecastTime = value;
+                OnPropertyChanged("forecastTime");
             }
         }
 
-        // publicly forecastUrl, privately ForecastUrl
-        public string forecastUrl
-        {
-            get
-            {
-                return ForecastUrl;
-            }
-            set
-            {
-                ForecastUrl = value;
-                OnPropertyChanged("forecastUrl");
-            }
-        }
+
 
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
@@ -105,7 +92,7 @@ namespace DeskApp.Weather
             string url = CurrentUrl.Replace("@LOC@", this.currLocation);
             Console.WriteLine("url is :" + url);
 
-            ParseXML parser = new ParseXML();
+            WeatherParseXML parser = new WeatherParseXML();
             try
             {
                 parser.GetFormattedXml(url);
@@ -150,7 +137,25 @@ namespace DeskApp.Weather
             #endregion
         }
 
+            public static ObservableCollection<Weather> fetchWeatherForecast(string currLocation)
+        {
+            string url = ForecastUrl.Replace("@LOC@", currLocation);
+            Console.WriteLine("forecast url is :" + url);
 
+            WeatherParseXML parser = new WeatherParseXML();
+            try
+            {
+                parser.GetFormattedXml(url);
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            ObservableCollection<Weather> test = new ObservableCollection<Weather>();
+            test = parser.parseForecastXMLDoc();
+            return test;
+        }
 
+    
     }
 }
