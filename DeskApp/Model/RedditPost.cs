@@ -18,7 +18,7 @@ namespace DeskApp.Reddit
         private string Thumbnail { get; set; }
         private string ShowThumbnail { get; set; }
         private string CommentsUrl { get; set; }
-        private string PostsView { get; set; }
+        private ObservableCollection<RedditComment> CommentsList;
 
         public RedditPost(string title, string author, string thumbnail)
         {
@@ -34,19 +34,19 @@ namespace DeskApp.Reddit
         public string title
         {
             get { return Title; }
-            set { Title = value;  OnPropertyChanged("title"); }
+            set { Title = value; OnPropertyChanged("title"); }
         }
 
         public string author
         {
             get { return Author; }
-            set { Author = value;  OnPropertyChanged("author"); }
-        } 
+            set { Author = value; OnPropertyChanged("author"); }
+        }
 
         public string thumbnail
         {
             get { return Thumbnail; }
-            set { Thumbnail = value;  OnPropertyChanged("thumbnail");  }
+            set { Thumbnail = value; OnPropertyChanged("thumbnail"); }
         }
 
         public string showThumbnail
@@ -61,10 +61,28 @@ namespace DeskApp.Reddit
             set { CommentsUrl = value; OnPropertyChanged("commentsUrl"); }
         }
 
-        public string postsView
+        public ObservableCollection<RedditComment> commentsList
         {
-            get { return PostsView; }
-            set { PostsView = value; OnPropertyChanged("postsView"); }
+            get
+            {
+                if (CommentsList == null)
+                {
+                    CommentsList = new ObservableCollection<RedditComment>();
+                }
+                return CommentsList;
+            }
+            set
+            {
+                if (CommentsList == null)
+                {
+                    CommentsList = new ObservableCollection<RedditComment>();
+                }
+                foreach (RedditComment rc in value)
+                {
+                    CommentsList.Add(rc);
+                }
+                OnPropertyChanged("commentsList");
+            }
         }
 
         public static ObservableCollection<RedditPost> fetchRedditPosts(string subreddit)
@@ -87,38 +105,51 @@ namespace DeskApp.Reddit
             return test;
         }
 
-        private ICommand openRedditPost;
+       
 
-        public ICommand OpenRedditPost
+        #region INotifyPropertyChanged Members
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string propertyName)
         {
-            get
+            if (PropertyChanged != null)
             {
-                if (openRedditPost == null)
-                {
-                    openRedditPost = new RelayCommand(
-                        param => this.OnRedditPostClick()
-                    );
-                }
-                return openRedditPost;
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        #endregion
 
-        public void OnRedditPostClick()
-        {         
-            postsView = "Hidden";
+    }
 
-            string url = commentsUrl + "/.rss";
-            RedditParseXML parser = new RedditParseXML();
-            try
-            {
-                parser.GetFormattedXml(url);
-            }
-            catch (Exception e)
-            {
-                return;
-            }
-            ObservableCollection<RedditPost> test = new ObservableCollection<RedditPost>();
-            parser.parseCommentsXml();
+
+    public class RedditComment : INotifyPropertyChanged
+    {
+        private string Title { get; set; }
+        private string Author { get; set; }
+        private string Avatar { get; set; }
+        private string Time { get; set; }
+
+        public string title
+        {
+            get { return Title; }
+            set { Title = value; OnPropertyChanged("title"); }
+        }
+
+        public string author
+        {
+            get { return Author; }
+            set { Author = value; OnPropertyChanged("author"); }
+        }
+
+        public string avatar
+        {
+            get { return Avatar; }
+            set { Avatar = value; OnPropertyChanged("avatar"); }
+        }
+
+        public string time
+        {
+            get { return Time; }
+            set { Time = value; OnPropertyChanged("time"); }
         }
 
         #region INotifyPropertyChanged Members

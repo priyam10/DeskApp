@@ -99,7 +99,7 @@ namespace DeskApp.Reddit
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.Message);
                 }
 
             }         
@@ -108,7 +108,7 @@ namespace DeskApp.Reddit
         }
 
 
-        public void parseCommentsXml()
+        public ObservableCollection<RedditComment> parseCommentsXml()
         {
             ObservableCollection<RedditPost> tempPost = new ObservableCollection<RedditPost>();
             XmlDocument xml = new XmlDocument();
@@ -179,6 +179,7 @@ namespace DeskApp.Reddit
                 //}
 
             }
+            return null;
         }
  
     }

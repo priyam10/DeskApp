@@ -17,10 +17,12 @@ namespace DeskApp.Weather
         private ObservableCollection<Weather> WeatherList;
         private string MySubreddit;
         private ObservableCollection<RedditPost> RedditPostList;
-        private ObservableCollection<RedditPost> CommentsList;
+        private string PostsView { get; set; }
+        private string CommentsView { get; set; }
 
         public GeneralViewModel()
         {
+                        
             NowWeather = new Weather();
             WeatherList = new ObservableCollection<Weather>();
             RedditPostList = new ObservableCollection<RedditPost>();
@@ -89,9 +91,9 @@ namespace DeskApp.Weather
         public string mySubreddit
         {
             get { return MySubreddit;  }
-            set { MySubreddit = value;  OnPropertyChanged("mySubreddit");  }
+            set { MySubreddit = value; OnPropertyChanged("mySubreddit");  }
         }
-
+  
 
         public ObservableCollection<RedditPost> redditPostList
         {
@@ -115,6 +117,17 @@ namespace DeskApp.Weather
             }
         }
 
+        public string postsView
+        {
+            get { return PostsView; }
+            set { PostsView = value; OnPropertyChanged("postsView"); }
+        }
+
+        public string commentsView
+        {
+            get { return CommentsView; }
+            set { CommentsView = value; OnPropertyChanged("commentsView"); }
+        }
 
         #region INotifyPropertyChanged Members
         public event PropertyChangedEventHandler PropertyChanged;
@@ -211,6 +224,40 @@ namespace DeskApp.Weather
             //RedditPostList = temp_list;
         }
 
-       // onclick of post. fetch comments. assign to commentslist. 
+
+        private ICommand openRedditPost;
+
+        public ICommand OpenRedditPost
+        {
+            get
+            {
+                if (openRedditPost == null)
+                {
+                    openRedditPost = new RelayCommand(
+                        param => this.OnRedditPostClick(param)
+                    );
+                }
+                return openRedditPost;
+            }
+        }
+
+        public void OnRedditPostClick(object e)
+        {
+            this.postsView = "Collapsed";
+            this.CommentsView = "Visible";
+            string url = (e as string) + "/.rss";
+            //RedditParseXML parser = new RedditParseXML();
+            //try
+            //{
+            //    parser.GetFormattedXml(url);
+            //}
+            //catch (Exception e)
+            //{
+            //    return;
+            //}
+            //ObservableCollection<RedditComment> test = new ObservableCollection<RedditComment>();
+            //test = parser.parseCommentsXml();
+        }
+
     }
 }
