@@ -1,4 +1,6 @@
-﻿using DeskApp.Reddit;
+﻿using DeskApp.Model;
+using DeskApp.Reddit;
+using DeskApp.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,16 +19,22 @@ namespace DeskApp.Weather
         private ObservableCollection<Weather> WeatherList;
         private string MySubreddit;
         private ObservableCollection<RedditPost> RedditPostList;
-        private string PostsView { get; set; }
-        private string CommentsView { get; set; }
+        private Visibility PostsView;
+        private Visibility CommentsView;
+        private Visibility BackButton;
+        private ObservableCollection<RedditComment> CommentsList;
+        BooleanToVisibilityConverter converter;
 
         public GeneralViewModel()
         {
-                        
+            converter = new BooleanToVisibilityConverter();
+            backButton = Visibility.Hidden;
+            commentsView = Visibility.Collapsed;
             NowWeather = new Weather();
             WeatherList = new ObservableCollection<Weather>();
             RedditPostList = new ObservableCollection<RedditPost>();
-            if(!String.IsNullOrEmpty(Properties.Settings.Default.FavLocation))
+            CommentsList = new ObservableCollection<RedditComment>();
+            if (!String.IsNullOrEmpty(Properties.Settings.Default.FavLocation))
             {
                 nowWeather.currLocation = Properties.Settings.Default.FavLocation;
                 NowWeather.fetchCurrentWeather();
@@ -86,30 +94,32 @@ namespace DeskApp.Weather
                 OnPropertyChanged("weatherList");
             }
         }
-    
+
 
         public string mySubreddit
         {
-            get { return MySubreddit;  }
-            set { MySubreddit = value; OnPropertyChanged("mySubreddit");  }
+            get { return MySubreddit; }
+            set { MySubreddit = value; OnPropertyChanged("mySubreddit"); }
         }
-  
+
 
         public ObservableCollection<RedditPost> redditPostList
         {
-            get {
+            get
+            {
                 if (RedditPostList == null)
                 {
                     RedditPostList = new ObservableCollection<RedditPost>();
                 }
                 return RedditPostList;
             }
-            set {
+            set
+            {
                 if (RedditPostList == null)
                 {
                     RedditPostList = new ObservableCollection<RedditPost>();
                 }
-                foreach(RedditPost rp in value)
+                foreach (RedditPost rp in value)
                 {
                     RedditPostList.Add(rp);
                 }
@@ -117,16 +127,45 @@ namespace DeskApp.Weather
             }
         }
 
-        public string postsView
+        public ObservableCollection<RedditComment> commentsList
+        {
+            get
+            {
+                if (CommentsList == null)
+                {
+                    CommentsList = new ObservableCollection<RedditComment>();
+                }
+                return CommentsList;
+            }
+            set
+            {
+                if (CommentsList == null)
+                {
+                    CommentsList = new ObservableCollection<RedditComment>();
+                }
+                foreach (RedditComment rc in value)
+                {
+                    CommentsList.Add(rc);
+                }
+                OnPropertyChanged("commentsList");
+            }
+        }
+
+        public Visibility postsView
         {
             get { return PostsView; }
             set { PostsView = value; OnPropertyChanged("postsView"); }
         }
 
-        public string commentsView
+        public Visibility commentsView
         {
             get { return CommentsView; }
             set { CommentsView = value; OnPropertyChanged("commentsView"); }
+        }
+        public Visibility backButton
+        {
+            get { return BackButton; }
+            set { BackButton = value; OnPropertyChanged("backButton"); }
         }
 
         #region INotifyPropertyChanged Members
@@ -177,7 +216,7 @@ namespace DeskApp.Weather
                 Weather weather_item = new Weather();
                 weather_item.currDegrees = w.currDegrees;
                 weather_item.currDesc = w.currDesc;
-                weather_item.forecastTime = w.forecastTime;                
+                weather_item.forecastTime = w.forecastTime;
                 WeatherList.Add(weather_item);
             }
         }
@@ -207,12 +246,13 @@ namespace DeskApp.Weather
 
         private void SaveRedditObject()
         {
+            BackClick();
             // Save command execution logic
             Properties.Settings.Default.LastSubreddit = MySubreddit;
             Properties.Settings.Default.Save();
             ObservableCollection<RedditPost> temp_list = RedditPost.fetchRedditPosts(MySubreddit);
             RedditPostList.Clear();
-            foreach(RedditPost rp in temp_list)
+            foreach (RedditPost rp in temp_list)
             {
                 //RedditPostList.Add(new RedditPost(rp.title, rp.author, rp.thumbnail));
 
@@ -241,23 +281,57 @@ namespace DeskApp.Weather
             }
         }
 
+        //Gets called when user clicks a reddit post.
         public void OnRedditPostClick(object e)
         {
-            this.postsView = "Collapsed";
-            this.CommentsView = "Visible";
-            string url = (e as string) + "/.rss";
-            //RedditParseXML parser = new RedditParseXML();
-            //try
-            //{
-            //    parser.GetFormattedXml(url);
-            //}
-            //catch (Exception e)
-            //{
-            //    return;
-            //}
-            //ObservableCollection<RedditComment> test = new ObservableCollection<RedditComment>();
-            //test = parser.parseCommentsXml();
+            backButton = Visibility.Visible;
+            postsView = Visibility.Collapsed;
+            commentsView = Visibility.Visible;
+
+            string url = /*(e as string)*/ "https://www.reddit.com/r/news/comments/5lvda8/vermont_governor_issues_192_pardons_for_minor_pot/"+ ".rss";
+            RedditParseXML parser = new RedditParseXML();
+            try
+            {
+                parser.GetFormattedXml(url);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+            ObservableCollection<RedditComment> temp_list = parser.parseCommentsXml();
+            CommentsList.Clear();
+            foreach (RedditComment rp in temp_list)
+            {
+                RedditComment new_redditcomment = new RedditComment();
+                new_redditcomment.writer = rp.writer;
+                new_redditcomment.content = rp.content;
+                new_redditcomment.time = rp.time;
+                CommentsList.Add(new_redditcomment);
+            }
         }
 
+
+        private ICommand _backButtonClick;
+
+        public ICommand BackButtonClick
+        {
+            get
+            {
+                if (_backButtonClick == null)
+                {
+                    _backButtonClick = new RelayCommand(
+                        param => this.BackClick()
+                    );
+                }
+                return _backButtonClick;
+            }
+        }
+
+        public void BackClick()
+        {
+            backButton = Visibility.Hidden;
+            postsView = Visibility.Visible;
+            commentsView = Visibility.Collapsed;
+        }
     }
 }

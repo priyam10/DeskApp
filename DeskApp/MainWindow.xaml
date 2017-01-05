@@ -41,9 +41,13 @@
                 </TabItem>
                 <TabItem Header="Reddit" x:Name="redditTab">
                     <StackPanel Margin="5">
-                            <TextBox x:Name="subredditBox" Height="20" Margin="5" Width="100" HorizontalAlignment="Center" Text="{Binding mySubreddit}"/>
+                        <StackPanel.Resources>
+                            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                        </StackPanel.Resources>
+                        <TextBox x:Name="subredditBox" Height="20" Margin="5" Width="100" HorizontalAlignment="Center" Text="{Binding mySubreddit}"/>
                             <Button x:Name="btnSearchReddit" Command="{Binding GetSubredditClick}" Width="90" Height="30" Margin="5" Content="Search"/>
-                        <ListView Name="reddit_lv" Margin="8" Height="400" Width="650" Background="Black" ItemsSource="{Binding redditPostList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="{Binding postsView}">
+                        <Button x:Name="btnBack" Command="{Binding BackButtonClick}" Visibility="{Binding backButton}" Width="90" Height="30" Margin="5" Content="Back"/>
+                        <ListView Name="reddit_lv" Margin="8" Height="500" Width="650" Background="Black" ItemsSource="{Binding redditPostList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="{Binding postsView}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Background="Transparent" Margin="5px" Orientation="Vertical" Width="610">
@@ -66,13 +70,21 @@
                             </ListView.ItemTemplate>
                         </ListView>
                         <!--Comments page -->
-                        <StackPanel Orientation="Vertical" Visibility="{Binding commentsView}">
-                                                    <ListView Margin="8" Height="400" Width="650" Background="Black" ItemsSource="{Binding commentsList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                                        <StackPanel Orientation="Vertical">
-                                                            <TextBlock Text="{Binding time}" FontSize="18" Width="440px" Height="Auto" Padding="10px" Foreground="Black" TextWrapping="Wrap"></TextBlock>
-                                                        </StackPanel>
-                                                    </ListView>
-                                                </StackPanel>
+                        <ListView Name="comments_lv" Margin="8" Height="500" Width="650" Background="Black" Visibility="{Binding commentsView}" ItemsSource="{Binding commentsList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Background="Transparent" Margin="5px" Orientation="Vertical" Width="610" Height="Auto">
+                                        <StackPanel Margin="5" Orientation="Vertical" Background="White">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding writer}" FontSize="12" Width="440px" Height="Auto" Padding="10px" Foreground="SteelBlue" FontStyle="Oblique" TextWrapping="Wrap"></TextBlock>
+                                                <TextBlock Text="{Binding time}" FontSize="12" Width="440px" Height="Auto" Padding="10px" Foreground="Gray" TextWrapping="Wrap"></TextBlock>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding content}" FontSize="12" Width="440px" Height="Auto" Padding="10px" Foreground="Black" TextWrapping="Wrap"></TextBlock>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </StackPanel>
                 </TabItem>
               

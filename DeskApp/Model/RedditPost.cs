@@ -18,7 +18,6 @@ namespace DeskApp.Reddit
         private string Thumbnail { get; set; }
         private string ShowThumbnail { get; set; }
         private string CommentsUrl { get; set; }
-        private ObservableCollection<RedditComment> CommentsList;
 
         public RedditPost(string title, string author, string thumbnail)
         {
@@ -61,29 +60,6 @@ namespace DeskApp.Reddit
             set { CommentsUrl = value; OnPropertyChanged("commentsUrl"); }
         }
 
-        public ObservableCollection<RedditComment> commentsList
-        {
-            get
-            {
-                if (CommentsList == null)
-                {
-                    CommentsList = new ObservableCollection<RedditComment>();
-                }
-                return CommentsList;
-            }
-            set
-            {
-                if (CommentsList == null)
-                {
-                    CommentsList = new ObservableCollection<RedditComment>();
-                }
-                foreach (RedditComment rc in value)
-                {
-                    CommentsList.Add(rc);
-                }
-                OnPropertyChanged("commentsList");
-            }
-        }
 
         public static ObservableCollection<RedditPost> fetchRedditPosts(string subreddit)
         {
@@ -121,47 +97,4 @@ namespace DeskApp.Reddit
     }
 
 
-    public class RedditComment : INotifyPropertyChanged
-    {
-        private string Title { get; set; }
-        private string Author { get; set; }
-        private string Avatar { get; set; }
-        private string Time { get; set; }
-
-        public string title
-        {
-            get { return Title; }
-            set { Title = value; OnPropertyChanged("title"); }
-        }
-
-        public string author
-        {
-            get { return Author; }
-            set { Author = value; OnPropertyChanged("author"); }
-        }
-
-        public string avatar
-        {
-            get { return Avatar; }
-            set { Avatar = value; OnPropertyChanged("avatar"); }
-        }
-
-        public string time
-        {
-            get { return Time; }
-            set { Time = value; OnPropertyChanged("time"); }
-        }
-
-        #region INotifyPropertyChanged Members
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion
-
-    }
 }
