@@ -254,8 +254,6 @@ namespace DeskApp.Weather
             RedditPostList.Clear();
             foreach (RedditPost rp in temp_list)
             {
-                //RedditPostList.Add(new RedditPost(rp.title, rp.author, rp.thumbnail));
-
                 RedditPost new_redditpost = new RedditPost(rp.title, rp.author, rp.thumbnail);
                 new_redditpost.showThumbnail = rp.showThumbnail;
                 new_redditpost.commentsUrl = rp.commentsUrl;
@@ -288,7 +286,7 @@ namespace DeskApp.Weather
             postsView = Visibility.Collapsed;
             commentsView = Visibility.Visible;
 
-            string url = /*(e as string)*/ "https://www.reddit.com/r/news/comments/5lvda8/vermont_governor_issues_192_pardons_for_minor_pot/"+ ".rss";
+            string url = (e as string); //"https://www.reddit.com/r/news/comments/5lvda8/vermont_governor_issues_192_pardons_for_minor_pot/"+ ".rss";
             RedditParseXML parser = new RedditParseXML();
             try
             {
