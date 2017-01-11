@@ -23,6 +23,7 @@ namespace DeskApp.Weather
         private Visibility CommentsView;
         private Visibility BackButton;
         private ObservableCollection<RedditComment> CommentsList;
+        private ObservableCollection<Manga> MangaList;
         BooleanToVisibilityConverter converter;
 
         public GeneralViewModel()
@@ -34,6 +35,8 @@ namespace DeskApp.Weather
             WeatherList = new ObservableCollection<Weather>();
             RedditPostList = new ObservableCollection<RedditPost>();
             CommentsList = new ObservableCollection<RedditComment>();
+            MangaList = new ObservableCollection<Manga>();
+            OnMangaListFetch();
             if (!String.IsNullOrEmpty(Properties.Settings.Default.FavLocation))
             {
                 nowWeather.currLocation = Properties.Settings.Default.FavLocation;
@@ -148,6 +151,30 @@ namespace DeskApp.Weather
                     CommentsList.Add(rc);
                 }
                 OnPropertyChanged("commentsList");
+            }
+        }
+
+        public ObservableCollection<Manga> mangaList
+        {
+            get
+            {
+                if (MangaList == null)
+                {
+                    MangaList = new ObservableCollection<Manga>();
+                }
+                return MangaList;
+            }
+            set
+            {
+                if (MangaList == null)
+                {
+                    MangaList = new ObservableCollection<Manga>();
+                }
+                foreach (Manga m in value)
+                {
+                    MangaList.Add(m);
+                }
+                OnPropertyChanged("mangaList");
             }
         }
 
@@ -286,7 +313,7 @@ namespace DeskApp.Weather
             postsView = Visibility.Collapsed;
             commentsView = Visibility.Visible;
 
-            string url = (e as string); //"https://www.reddit.com/r/news/comments/5lvda8/vermont_governor_issues_192_pardons_for_minor_pot/"+ ".rss";
+            string url = (e as string); 
             RedditParseXML parser = new RedditParseXML();
             try
             {
@@ -331,5 +358,43 @@ namespace DeskApp.Weather
             postsView = Visibility.Visible;
             commentsView = Visibility.Collapsed;
         }
+
+
+
+        // Manga stuff
+        private ICommand openMangaList;
+
+        public ICommand OpenMangaList
+        {
+            get
+            {
+                if (openMangaList == null)
+                {
+                    openMangaList = new RelayCommand(
+                        param => this.OnMangaListFetch()
+                    );
+                }
+                return openMangaList;
+            }
+        }
+
+        //Gets called when user clicks a reddit post.
+        public void OnMangaListFetch()
+        {
+
+            ObservableCollection<Manga> temp_list = Manga.fetchMangaList();
+            MangaList.Clear();
+            foreach (Manga m in temp_list)
+            {
+                Manga new_manga = new Manga();
+                new_manga.mangaName = m.mangaName;
+                new_manga.mangaLink = m.mangaLink;
+                new_manga.pubDate = m.pubDate;
+                new_manga.chapterDesc = m.chapterDesc;
+                MangaList.Add(new_manga);
+            }
+        }
+
     }
+
 }

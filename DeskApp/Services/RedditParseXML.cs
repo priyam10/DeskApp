@@ -55,14 +55,18 @@ namespace DeskApp.Reddit
 
         public ObservableCollection<RedditPost> parseXMLDoc()
         {
-            //HtmlNode.ElementsFlags.Remove("form");
             ObservableCollection<RedditPost> tempPost = new ObservableCollection<RedditPost>();
             HtmlDocument doc = new HtmlDocument();
-            //doc.OptionAutoCloseOnEnd = true;
-            //doc.OptionDefaultStreamEncoding = Encoding.UTF8;
-            doc.LoadHtml(html_string);
+            HtmlNodeCollection nodelist;
+            try
+            {
+                doc.LoadHtml(html_string);
+                nodelist = doc.DocumentNode.SelectNodes("//entry");
+            }catch(Exception ex)
+            {
+                return null;
+            }
 
-            HtmlNodeCollection nodelist = doc.DocumentNode.SelectNodes("//entry");
 
             foreach (HtmlNode node in nodelist)
             {
@@ -70,6 +74,10 @@ namespace DeskApp.Reddit
                 {
                     string author = node.SelectSingleNode("author//name").InnerText;
                     string title = node.SelectSingleNode("title").InnerText;
+                    if (title.Contains("&quot;") || title.Contains(""))
+                    {
+                        title = title.Replace("&quot;","\"");
+                    }
                     string time = node.SelectSingleNode("updated").InnerText;
                     string comments = node.SelectSingleNode("link").OuterHtml;
                     RedditPost reddit_entry = new RedditPost();
@@ -136,6 +144,16 @@ namespace DeskApp.Reddit
                 {
                     string writer = node.SelectSingleNode("author//name") == null? null : node.SelectSingleNode("author//name").InnerText;
                     string content = node.SelectSingleNode("content").InnerHtml;
+                    //content = content.Replace("&lt;", "");
+                    //content = content.Replace("&gt;", "");
+                    //content = content.Replace("p&gt;", "");
+                    //content = content.Replace("&quot;", "");
+                    //content = Regex.Replace(content, "&.*?;", String.Empty);
+                    //content = content.Replace("!-- SC_OFF --div class=mdp",String.Empty);
+                    //content = content.Replace("/p /div!-- SC_ON --", String.Empty);
+                    //content = content.Replace("#39;", "'");
+                    content = WebUtility.HtmlDecode(content);
+                    content = Regex.Replace(content, @"<[^>]+>|&nbsp;", "").Trim();
                     string time = node.SelectSingleNode("updated").InnerText;
                     RedditComment reddit_comment = new RedditComment();
                     if (writer != null && writer.Contains("/u/"))

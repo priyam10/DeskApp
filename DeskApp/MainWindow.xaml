@@ -47,7 +47,7 @@
                         <TextBox x:Name="subredditBox" Height="20" Margin="5" Width="100" HorizontalAlignment="Center" Text="{Binding mySubreddit}"/>
                             <Button x:Name="btnSearchReddit" Command="{Binding GetSubredditClick}" Width="90" Height="30" Margin="5" Content="Search"/>
                         <Button x:Name="btnBack" Command="{Binding BackButtonClick}" Visibility="{Binding backButton}" Width="90" Height="30" Margin="5" Content="Back"/>
-                        <ListView Name="reddit_lv" Margin="8" Height="500" Width="650" Background="Black" ItemsSource="{Binding redditPostList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="{Binding postsView}">
+                        <ListView Name="reddit_lv" Margin="8" Height="750" Width="650" Background="Black" ItemsSource="{Binding redditPostList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="{Binding postsView}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Background="Transparent" Margin="5px" Orientation="Vertical" Width="610">
@@ -87,7 +87,29 @@
                         </ListView>
                     </StackPanel>
                 </TabItem>
-              
+                <TabItem Header="Manga" x:Name="mangaTab">
+                    <StackPanel Margin="5">
+                        <Button Command="{Binding OpenMangaList}"  Width="90" Height="30" Margin="5" Content="Update"/>
+                        <ListView Margin="8" Height="400" Width="450" Padding="5px" Background="Black" ItemContainerStyle="{StaticResource BorderedItem}" ItemsSource="{Binding mangaList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Background="Transparent" Margin="5px" Orientation="Vertical" Width="400">
+                                        <TextBlock FontSize="14" Width="Auto" Height="Auto" Foreground="White" TextWrapping="Wrap">
+                                            <Bold>
+                                                <Run Text="{Binding mangaName}"/>
+                                            </Bold>
+                                        </TextBlock>
+                                        <DockPanel Width="400">
+                                            <TextBlock Text="{Binding chapterDesc}" Width="250" Foreground="White" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding pubDate}" Foreground="White" Width="Auto" HorizontalAlignment="Right"/>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </TabItem>
+
             </TabControl>
 
         </Grid>
