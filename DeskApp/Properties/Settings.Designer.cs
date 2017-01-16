@@ -34,5 +34,17 @@ namespace DeskApp.Properties {
                 this["FavLocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastSubreddit {
+            get {
+                return ((string)(this["LastSubreddit"]));
+            }
+            set {
+                this["LastSubreddit"] = value;
+            }
+        }
     }
 }
